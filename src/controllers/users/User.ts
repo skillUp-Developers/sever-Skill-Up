@@ -8,7 +8,7 @@ export const createUser = async (req: Request, res: Response | any) => {
   try {
     const { email, userName, password } = req.body
 
-    if (!email || !userName || password) {
+    if (!email || !userName || !password) {
       return res.status(400).json({
         message: 'please provide into',
       })
