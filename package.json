@@ -9,7 +9,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "This backend project uses **Node.js**, **TypeScript**, and **Prisma** ORM, with **PostgreSQL** as the database. The project follows best practices for environment-based configuration using a `.env` file.",
   "dependencies": {
     "@prisma/client": "^5.20.0",
     "@types/cors": "^2.8.17",
@@ -20,8 +20,10 @@
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "nodemon": "^3.1.7",
+    "pg": "^8.13.0",
     "prisma": "^5.20.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.3"
-  }
+  },
+  "devDependencies": {}
 }
