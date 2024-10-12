@@ -1,7 +1,7 @@
 import cors from 'cors'
 import dotenv from 'dotenv'
 import express from 'express'
-
+import user from './routes/users/User'
 //
 const app = express()
 dotenv.config()
@@ -17,6 +17,8 @@ app.use(express.json())
 
 
 //endPoints
+
+app.use('/api/user',user)
 
 
 
