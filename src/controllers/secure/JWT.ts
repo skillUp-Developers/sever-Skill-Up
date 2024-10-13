@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { NextFunction, Request, Response } from 'express'
 import { userData } from '../interfaces/UserInterface'
+import { projectData } from '../interfaces/ProjectInterface'
 
 export const generateToken = (user: userData) => {
   const payload = user
@@ -9,6 +10,10 @@ export const generateToken = (user: userData) => {
 
 export interface userRequest extends Request {
   user?: userData
+}
+
+export interface projectRequest extends Request {
+  user?: projectData;
 }
 
 export const decoded: any = (
