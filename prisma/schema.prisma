@@ -1,25 +1,23 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-generator client {
-  provider = "prisma-client-js"
-}
-
+// Define the datasource
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-//models
-
-enum Role {
-  ADMIN
-  USER
+// Define the generator
+generator client {
+  provider = "prisma-client-js" // This generates the Prisma Client
 }
 
+// Define the Role enum
+enum Role {
+  USER
+  ADMIN
+  MODERATOR 
+}
+
+// Define the User model
 model user {
   id       Int      @id @default(autoincrement())
   userName String
@@ -30,30 +28,33 @@ model user {
   updateAt DateTime @updatedAt
 }
 
+// Define the Project model
 model project {
   id          Int      @id @default(autoincrement())
   name        String
   description String?
-  photo       String
+  imageUrl    String   // This will store the Cloudflare R2 image URL
   createAt    DateTime @default(now())
   updateAt    DateTime @updatedAt
 }
 
+// Define the Team model
 model team {
   id          Int      @id @default(autoincrement())
   name        String
   skill       String
   description String?
-  photo       String
+  imageUrl    String   // Storing the image URL instead of photo
   createAt    DateTime @default(now())
   updateAt    DateTime @updatedAt
 }
 
+// Define the Client model
 model client {
   id          Int      @id @default(autoincrement())
   name        String
   description String?
-  logo        String
+  logoUrl     String   // Storing the logo URL
   createAt    DateTime @default(now())
   updateAt    DateTime @updatedAt
 }
