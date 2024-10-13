@@ -3,13 +3,13 @@ import dotenv from 'dotenv'
 import express from 'express'
 import user from './routes/users/User'
 import teamRoutes from './routes/teams/teamRoutes'
-//
+
 const app = express()
 dotenv.config()
 const port = process.env.port
 app.use(
   cors({
-    origin: 'http://localhost:5000',
+    origin: 'http://localhost:5173',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   })

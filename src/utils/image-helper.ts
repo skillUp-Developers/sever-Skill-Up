@@ -1,0 +1,1 @@
+// create a function that handles image uploading
