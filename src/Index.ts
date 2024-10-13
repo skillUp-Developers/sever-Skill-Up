@@ -17,7 +17,7 @@ app.use(
 );
 app.use(express.json());
 
-//endPoints
+//endPoints 
 
 app.use("/api/user", user);
 app.use(
