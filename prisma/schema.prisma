@@ -35,7 +35,7 @@ model project {
   imageUrl    String // This will store the Cloudflare R2 image URL
   createAt    DateTime @default(now())
   updateAt    DateTime @updatedAt
-  categoryId  Int
+  categoryId  Int      @default(1)
   category    category @relation(fields: [categoryId], references: [id])
 }
 
@@ -71,4 +71,16 @@ model category {
 
   //relationship
   project project[]
+}
+
+//job model
+
+model job {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  link        String
+  isActive    Boolean  @default(true)
+  createAt    DateTime @default(now())
+  updateAt    DateTime @updatedAt
 }
