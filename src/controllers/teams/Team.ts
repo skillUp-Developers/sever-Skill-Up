@@ -37,19 +37,21 @@ export const createTeam = async (req: Request, res: Response) => {
 };
 
 // Update team
-export const updateTeam = async (req: Request, res: Response) => {
+export const updateTeam = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   const { name, skill, description } = req.body;
   const file = req.file;
 
   try {
+    // Find the existing team
     const existingTeam = await prisma.team.findUnique({ where: { id: Number(id) } });
 
     if (!existingTeam) {
-      return res.status(404).json({ error: "Team not found" });
+      res.status(404).json({ error: "Team not found" });
+      return; // Explicit return to stop further execution
     }
 
-    // Handle image upload
+    // Handle image upload if a file is provided
     const imageUrl = file ? await uploadToR2(file) : existingTeam.imageUrl;
 
     // Update the team entry in the database
@@ -59,11 +61,11 @@ export const updateTeam = async (req: Request, res: Response) => {
         name,
         skill,
         description,
-        imageUrl,
+        imageUrl, // Keep the existing image if none uploaded
       },
     });
 
-    res.status(200).json(updatedTeam);
+    res.status(200).json(updatedTeam); // Send the updated team data
   } catch (error) {
     console.error("Error updating team", error);
     res.status(500).json({ error: 'Error updating team' });
