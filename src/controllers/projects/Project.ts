@@ -2,7 +2,14 @@ import { Response } from "express";
 import { projectRequest } from "../secure/JWT";
 import { PrismaClient } from "@prisma/client";
 
+import { uploadToR2 } from "../../lib/uploadToR2"; // Ensure this function is implemented correctly
+import multer from "multer";
+
 const prisma = new PrismaClient();
+
+// Configure multer for file uploads
+const storage = multer.memoryStorage(); // Store files in memory
+const upload = multer({ storage }); // Multer middleware
 export const getProjects = async (req: projectRequest, res: Response | any) => {
   try {
     const projects = await prisma.project.findMany({
@@ -10,7 +17,7 @@ export const getProjects = async (req: projectRequest, res: Response | any) => {
         id: true,
         name: true,
         description: true,
-        photo: true,
+        imageUrl: true,
         createAt: true,
         updateAt: true,
       },
@@ -38,7 +45,7 @@ export const getProject = async (req: projectRequest, res: Response | any) => {
         id: true,
         name: true,
         description: true,
-        photo: true,
+        imageUrl: true,
         createAt: true,
         updateAt: true,
       },
@@ -67,19 +74,24 @@ export const getProject = async (req: projectRequest, res: Response | any) => {
 
 export const addProject = async (req: projectRequest, res: Response | any) => {
   try {
-    const { name, description, photo } = req.body;
+    const { name, description } = req.body;
+
+    const file: Express.Multer.File | undefined = req.file;
+
+    // Upload the file if present
+    const imageUrl = file ? await uploadToR2(file) : "";
 
     const project = await prisma.project.create({
       data: {
         name,
         description,
-        photo,
+        imageUrl,
       },
       select: {
         id: true,
         name: true,
         description: true,
-        photo: true,
+        imageUrl: true,
         createAt: true,
         updateAt: true,
       },
@@ -100,17 +112,31 @@ export const addProject = async (req: projectRequest, res: Response | any) => {
 export const addProjects = async (req: projectRequest, res: Response | any) => {
   try {
     // Assuming req.body is an array of projects
-    const projects = req.body;
+    const projects = req.body; // Example: [{ name: 'Project 1', description: 'Description 1' }, ...]
 
-    // Create multiple projects using prisma.createMany
-    const createdProjects = await prisma.project.createMany({
-      data: projects, // Here, we're expecting an array of project objects
-      skipDuplicates: true, // Optional: skips creating if the project already exists based on unique fields
+    // Prepare an array to hold all the project creation promises
+    const projectPromises = projects.map(async (project: any) => {
+      const file: Express.Multer.File | undefined = project.file;
+
+      // Upload the file if present for each project
+      const imageUrl = file ? await uploadToR2(file) : "";
+
+      // Create the project using prisma.create
+      return prisma.project.create({
+        data: {
+          name: project.name,
+          description: project.description,
+          imageUrl,
+        },
+      });
     });
+
+    // Wait for all projects to be created
+    const createdProjects = await Promise.all(projectPromises);
 
     res.json({
       result: createdProjects,
-      message: `${createdProjects.count} projects have been successfully added.`,
+      message: `${createdProjects.length} projects have been successfully added.`,
       success: true,
     });
   } catch (error) {
@@ -126,17 +152,22 @@ export const editProject = async (req: projectRequest, res: Response | any) => {
   try {
     const { id } = req.params;
 
+    const file = req.file;
+
+    const existingProject = await prisma.project.findUnique({
+      where: { id: Number(id) },
+    });
+
+    if (!existingProject) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
+    // Handle image upload
+    const imageUrl = file ? await uploadToR2(file) : existingProject.imageUrl;
+
     const project = await prisma.project.update({
       where: { id: parseInt(id) },
-      data: req.body,
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        photo: true,
-        createAt: true,
-        updateAt: true,
-      },
+      data: { ...existingProject, imageUrl },
     });
     res.json({
       result: { ...project },
@@ -157,27 +188,34 @@ export const editProjects = async (
 ) => {
   try {
     // Assuming req.body contains an array of projects with their ids
-    const projects = req.body; // Example: [{ id: 1, name: 'New Name', description: 'New Description' }, ...]
+    const projects = req.body; // Example: [{ id: 1, name: 'New Name', description: 'New Description', imageUrl: '...' }, ...]
 
     const updatedProjectsPromises = projects.map(async (project: any) => {
+      // Find the existing project by id
+      const existingProject = await prisma.project.findUnique({
+        where: { id: parseInt(project.id) },
+      });
+
+      if (!existingProject) {
+        throw new Error(`Project with id ${project.id} not found`);
+      }
+
+      // Handle image upload logic: if image is provided, upload it, else keep the existing image URL
+      const imageUrl = project.file
+        ? await uploadToR2(project.file)
+        : project.imageUrl || existingProject.imageUrl;
+
+      // Update the project with new data
       return prisma.project.update({
         where: { id: parseInt(project.id) }, // Update project by its ID
         data: {
-          name: project.name,
-          description: project.description,
-          photo: project.photo,
-        },
-        select: {
-          id: true,
-          name: true,
-          description: true,
-          photo: true,
-          createAt: true,
-          updateAt: true,
+          ...project,
+          imageUrl: imageUrl,
         },
       });
     });
 
+    // Wait for all projects to be updated
     const updatedProjects = await Promise.all(updatedProjectsPromises);
 
     res.json({
@@ -186,6 +224,7 @@ export const editProjects = async (
       success: true,
     });
   } catch (error) {
+    // Return a more detailed error if a specific project is not found
     res.status(500).json({
       message: "Error happened at calling endpoint (/edit-projects)",
       error: error,
@@ -206,7 +245,7 @@ export const deleteProject = async (
         id: true,
         name: true,
         description: true,
-        photo: true,
+        imageUrl: true,
         createAt: true,
         updateAt: true,
       },
@@ -259,3 +298,6 @@ export const deleteProjects = async (
     });
   }
 };
+
+// Export the multer middleware for use in your routes
+export const uploadMiddleware = upload.single("photo");

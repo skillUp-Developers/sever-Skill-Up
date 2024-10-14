@@ -8,6 +8,7 @@ import {
   editProjects,
   getProject,
   getProjects,
+  uploadMiddleware,
 } from "../../controllers/projects/Project";
 
 const router: Router = express.Router();
@@ -15,10 +16,10 @@ const router: Router = express.Router();
 router.get("/get-projects", getProjects);
 router.get("/get-project/:id", getProject);
 
-router.post("/add-project", addProject);
+router.post("/add-project",uploadMiddleware, addProject);
 router.post("/add-projects", addProjects);
 
-router.post("/edit-project/:id", editProject);
+router.post("/edit-project/:id",uploadMiddleware, editProject);
 
 router.post("/edit-projects", editProjects);
 
