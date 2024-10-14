@@ -20,7 +20,7 @@ export const uploadToR2 = async (file: Express.Multer.File): Promise<string> => 
 
     await s3Client.send(new PutObjectCommand(uploadParams));
 
-    const imageUrl = `${process.env.R2_ENDPOINT}/${process.env.R2_BUCKET_NAME}/${fileKey}`;
+    const imageUrl = `https://pub-3ea46b7dcfbf4dd9828bfd06c1989ace.r2.dev/${fileKey}`; 
     console.log("Image URL:", imageUrl); // Log the URL for debugging
     return imageUrl; // Return the URL as a string
   } catch (error) {
