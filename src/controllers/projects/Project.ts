@@ -35,6 +35,8 @@ export const getProjects = async (req: projectRequest, res: Response | any) => {
     });
   }
 };
+
+
 export const getProject = async (req: projectRequest, res: Response | any) => {
   try {
     const { id } = req.params;
@@ -71,6 +73,7 @@ export const getProject = async (req: projectRequest, res: Response | any) => {
     });
   }
 };
+
 
 export const addProject = async (req: projectRequest, res: Response | any) => {
   try {

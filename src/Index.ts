@@ -4,6 +4,7 @@ import express from "express";
 import user from "./routes/users/User";
 import teamRoutes from "./routes/teams/teamRoutes";
 import project from "./routes/projects/Project";
+import client from "./routes/client/ClientRouter";
 
 const app = express();
 dotenv.config();
@@ -22,5 +23,6 @@ app.use(express.json());
 app.use("/api/user", user);
 app.use("/api/teams", teamRoutes);
 app.use("/api/project", project);
+app.use("/api/client", client);
 
 app.listen(port, () => console.log(`server running ${port}`));
