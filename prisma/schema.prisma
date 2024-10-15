@@ -16,6 +16,7 @@ enum Role {
   MODERATOR
 }
 
+
 // Define the User model
 model user {
   id       Int      @id @default(autoincrement())
