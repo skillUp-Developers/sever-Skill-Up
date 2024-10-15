@@ -43,6 +43,8 @@ export const getProject = async (req: projectRequest, res: Response | any) => {
 
     const project = await prisma.project.findUnique({
       where: { id: parseInt(id) },
+
+      // 
       select: {
         id: true,
         name: true,
