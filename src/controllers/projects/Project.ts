@@ -12,16 +12,7 @@ const storage = multer.memoryStorage(); // Store files in memory
 const upload = multer({ storage }); // Multer middleware
 export const getProjects = async (req: projectRequest, res: Response | any) => {
   try {
-    const projects = await prisma.project.findMany({
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        imageUrl: true,
-        createAt: true,
-        updateAt: true,
-      },
-    });
+    const projects = await prisma.project.findMany();
 
     res.json({
       result: [...projects],
@@ -36,23 +27,12 @@ export const getProjects = async (req: projectRequest, res: Response | any) => {
   }
 };
 
-
 export const getProject = async (req: projectRequest, res: Response | any) => {
   try {
     const { id } = req.params;
 
     const project = await prisma.project.findUnique({
       where: { id: parseInt(id) },
-
-      // 
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        imageUrl: true,
-        createAt: true,
-        updateAt: true,
-      },
     });
 
     // If the project doesn't exist, return a 404 response
@@ -76,10 +56,9 @@ export const getProject = async (req: projectRequest, res: Response | any) => {
   }
 };
 
-
 export const addProject = async (req: projectRequest, res: Response | any) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, categoryId, clientId } = req.body;
 
     const file: Express.Multer.File | undefined = req.file;
 
@@ -91,14 +70,8 @@ export const addProject = async (req: projectRequest, res: Response | any) => {
         name,
         description,
         imageUrl,
-      },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        imageUrl: true,
-        createAt: true,
-        updateAt: true,
+        categoryId: parseInt(categoryId),
+        clientId: parseInt(clientId),
       },
     });
     res.json({
@@ -109,6 +82,7 @@ export const addProject = async (req: projectRequest, res: Response | any) => {
     res.status(500).json({
       message: "error happened at calling endpoint (/add-project)",
       error: error,
+
       success: false,
     });
   }
@@ -132,6 +106,8 @@ export const addProjects = async (req: projectRequest, res: Response | any) => {
           name: project.name,
           description: project.description,
           imageUrl,
+          categoryId: project.categoryId,
+          clientId: project.clientId,
         },
       });
     });
@@ -246,14 +222,6 @@ export const deleteProject = async (
     const { id } = req.params;
     const project = await prisma.project.delete({
       where: { id: parseInt(id) },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        imageUrl: true,
-        createAt: true,
-        updateAt: true,
-      },
     });
 
     res.json({
