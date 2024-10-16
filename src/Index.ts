@@ -25,7 +25,7 @@ app.use(express.json())
 app.use('/api/user', user)
 app.use('/api/teams', teamRoutes)
 app.use('/api/project', project)
-app.use("/categories", category);
+app.use("/api/categories", category);
 app.use('/api/client', client)
 app.use('/api/job', job)
 

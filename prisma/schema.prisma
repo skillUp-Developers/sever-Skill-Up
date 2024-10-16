@@ -16,7 +16,6 @@ enum Role {
   MODERATOR
 }
 
-
 // Define the User model
 model user {
   id       Int      @id @default(autoincrement())
@@ -34,10 +33,15 @@ model project {
   name        String
   description String?
   imageUrl    String // This will store the Cloudflare R2 image URL
+  link        String?
   createAt    DateTime @default(now())
   updateAt    DateTime @updatedAt
-  categoryId  Int      @default(1)
-  category    category @relation(fields: [categoryId], references: [id])
+
+  categoryId Int
+  category   category @relation(fields: [categoryId], references: [id])
+
+  client   client? @relation(fields: [clientId], references: [id])
+  clientId Int?
 }
 
 // Define the Team model
@@ -59,6 +63,9 @@ model client {
   logoUrl     String // Storing the logo URL
   createAt    DateTime @default(now())
   updateAt    DateTime @updatedAt
+
+  // Relationship with the project
+  project project[]
 }
 
 // category Model
