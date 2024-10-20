@@ -40,8 +40,7 @@ model project {
   categoryId Int
   category   category @relation(fields: [categoryId], references: [id])
 
-  client   client? @relation(fields: [clientId], references: [id])
-  clientId Int?
+  client String
 }
 
 // Define the Team model
@@ -63,9 +62,6 @@ model client {
   logoUrl     String // Storing the logo URL
   createAt    DateTime @default(now())
   updateAt    DateTime @updatedAt
-
-  // Relationship with the project
-  project project[]
 }
 
 // category Model
