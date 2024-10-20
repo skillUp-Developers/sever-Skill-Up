@@ -5,5 +5,5 @@ export interface projectData {
   photo: String;
   link?: String;
   categoryId: String;
-  clientId: String;
+  client: String;
 }
