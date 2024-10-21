@@ -54,8 +54,7 @@ export const updateTeam = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { id } = req.params
-  const { name, skill, description } = req.body
+  const { name, skill, description, id } = req.body
   const file = req.file
 
   try {

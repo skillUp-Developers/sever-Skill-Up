@@ -88,8 +88,9 @@ export const addCategory = async (req: projectRequest, res: Response | any) => {
       success: true,
     })
   } catch (error) {
+    console.log(error)
     res.status(500).json({
-      message: 'Error happened at calling endpoint (/add-category)',
+      message: 'server error',
       error,
       success: false,
     })

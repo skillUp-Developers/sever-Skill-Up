@@ -12,6 +12,6 @@ const router = express.Router()
 // Add routes for team CRUD with image uploads
 router.post('/', uploadMiddleware, createTeam)
 router.get('/all', getTeam)
-// router.put('/teams/:id', uploadMiddleware, updateTeam);
+router.put('/teams/update', uploadMiddleware, updateTeam);
 
 export default router
