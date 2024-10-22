@@ -77,7 +77,7 @@ export const updateClients = async (
   res: Response | any
 ) => {
   try {
-    const { id } = req.params
+    const { id, name, description } = req.body
 
     const file = req.file
 
@@ -94,7 +94,7 @@ export const updateClients = async (
 
     const client = await prisma.client.update({
       where: { id: parseInt(id) },
-      data: { ...existingClient, logoUrl },
+      data: { name, description, logoUrl },
     })
     res.json({
       result: { ...client },

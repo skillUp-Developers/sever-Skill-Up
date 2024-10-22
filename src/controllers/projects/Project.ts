@@ -4,6 +4,7 @@ import { PrismaClient } from "@prisma/client";
 
 import { uploadToR2 } from "../../lib/uploadToR2"; // Ensure this function is implemented correctly
 import multer from "multer";
+import { getCategories } from "../categories/category";
 
 const prisma = new PrismaClient();
 
@@ -12,15 +13,35 @@ const storage = multer.memoryStorage(); // Store files in memory
 const upload = multer({ storage }); // Multer middleware
 export const getProjects = async (req: projectRequest, res: Response | any) => {
   try {
-    const projects = await prisma.project.findMany();
+    const projects = await prisma.project.findMany({
+      include: {
+        category: {
+          select: {
+            id: true, // Selects 'id' from the category
+            name: true, // Selects 'name' from the category
+            description: true, // Selects 'description' from the category
+          },
+        },
+      },
+    });
+
+    // Query the database to get a list of all categories with specific fields selected
+    const categories = await prisma.category.findMany({
+      select: {
+        id: true,
+        name: true,
+        description: true,
+      },
+    });
 
     res.json({
-      result: [...projects],
+      result: projects,
+      categories,
       success: true,
     });
   } catch (error) {
     res.status(500).json({
-      message: "error happened at calling endpoint (/get-projects)",
+      message: "Error happened at calling endpoint (/get-projects)",
       error: error,
       success: false,
     });
@@ -58,7 +79,7 @@ export const getProject = async (req: projectRequest, res: Response | any) => {
 
 export const addProject = async (req: projectRequest, res: Response | any) => {
   try {
-    const { name, description, categoryId, clientId } = req.body;
+    const { name, description, categoryId, client, link } = req.body;
 
     const file: Express.Multer.File | undefined = req.file;
 
@@ -71,7 +92,8 @@ export const addProject = async (req: projectRequest, res: Response | any) => {
         description,
         imageUrl,
         categoryId: parseInt(categoryId),
-        clientId: parseInt(clientId),
+        client,
+        link,
       },
     });
     res.json({
@@ -107,7 +129,7 @@ export const addProjects = async (req: projectRequest, res: Response | any) => {
           description: project.description,
           imageUrl,
           categoryId: project.categoryId,
-          clientId: project.clientId,
+          client: project.client,
         },
       });
     });
@@ -132,9 +154,9 @@ export const addProjects = async (req: projectRequest, res: Response | any) => {
 export const editProject = async (req: projectRequest, res: Response | any) => {
   try {
     const { id } = req.params;
-
     const file = req.file;
 
+    // Finding the existing project to check if it exists
     const existingProject = await prisma.project.findUnique({
       where: { id: Number(id) },
     });
@@ -143,20 +165,44 @@ export const editProject = async (req: projectRequest, res: Response | any) => {
       return res.status(404).json({ error: "Project not found" });
     }
 
-    // Handle image upload
+    // Handle image upload, only if a file is provided
     const imageUrl = file ? await uploadToR2(file) : existingProject.imageUrl;
 
+    // Update only the fields that need to be updated
+    const updatedData = {
+      name: req.body.name || existingProject.name,
+      description: req.body.description || existingProject.description,
+      imageUrl: imageUrl,
+      link: req.body.link || existingProject.link,
+      categoryId: req.body.categoryId
+        ? Number(req.body.categoryId)
+        : existingProject.categoryId,
+      client: req.body.client || existingProject.client,
+    };
+
     const project = await prisma.project.update({
-      where: { id: parseInt(id) },
-      data: { ...existingProject, imageUrl },
+      where: { id: Number(id) },
+      data: updatedData,
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        imageUrl: true,
+        link: true,
+        categoryId: true,
+        client: true,
+        createAt: true,
+        updateAt: true,
+      },
     });
+
     res.json({
-      result: { ...project },
+      result: project,
       success: true,
     });
   } catch (error) {
     res.status(500).json({
-      message: "error happened at calling endpoint (/edit-project)",
+      message: "Error happened at calling endpoint (/edit-project)",
       error: error,
       success: false,
     });

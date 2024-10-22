@@ -9,7 +9,7 @@ import client from './routes/client/ClientRouter'
 import job from './routes/jobs/JobsRouter'
 
 const app = express()
-dotenv.config()
+dotenv.config() 
 const port = process.env.port
 app.use(
   cors({
