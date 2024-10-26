@@ -12,12 +12,8 @@ export const getCategories = async (
   try {
     // Query the database to get a list of all categories with specific fields selected
     const categories = await prisma.category.findMany({
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        createAt: true,
-        updateAt: true,
+      include: {
+        project: true,
       },
     })
 
