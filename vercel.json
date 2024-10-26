@@ -2,14 +2,12 @@
   "builds": [
     {
       "src": "api/**/*.ts",
-      "dist": "api/**/*.ts",
       "use": "@vercel/node"
     }
   ],
   "rewrites": [
     {
       "source": "/(.*)",
-      "dist": "/(.*)",
       "destination": "/api/index.ts"
     }
   ]
