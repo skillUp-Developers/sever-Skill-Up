@@ -4,16 +4,15 @@ import express from 'express'
 import user from './routes/users/User'
 import teamRoutes from './routes/teams/teamRoutes'
 import project from './routes/projects/Project'
-import  category  from './routes/categories/category'
+import category from './routes/categories/category'
 import client from './routes/client/ClientRouter'
 import job from './routes/jobs/JobsRouter'
 
 const app = express()
-dotenv.config() 
+dotenv.config()
 const port = process.env.port
 app.use(
   cors({
-    origin: 'http://localhost:5173',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
@@ -25,7 +24,7 @@ app.use(express.json())
 app.use('/api/user', user)
 app.use('/api/teams', teamRoutes)
 app.use('/api/project', project)
-app.use("/api/categories", category);
+app.use('/api/categories', category)
 app.use('/api/client', client)
 app.use('/api/job', job)
 
