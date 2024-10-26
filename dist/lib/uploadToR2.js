@@ -13,12 +13,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.uploadToR2 = void 0;
-// uploadToR2.js
 const client_s3_1 = require("@aws-sdk/client-s3");
 const r2Client_1 = __importDefault(require("./r2Client"));
 const uuid_1 = require("uuid");
 const path_1 = __importDefault(require("path"));
+// Specify that the file parameter is of type Express.Multer.File
 const uploadToR2 = (file) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!process.env.R2_BUCKET_NAME || !process.env.R2_ENDPOINT) {
+        throw new Error("R2_BUCKET_NAME or R2_ENDPOINT is not defined in the environment variables.");
+    }
     const fileKey = `${(0, uuid_1.v4)()}${path_1.default.extname(file.originalname)}`;
     try {
         const uploadParams = {
@@ -28,8 +31,9 @@ const uploadToR2 = (file) => __awaiter(void 0, void 0, void 0, function* () {
             ContentType: file.mimetype,
         };
         yield r2Client_1.default.send(new client_s3_1.PutObjectCommand(uploadParams));
-        const imageUrl = `${process.env.R2_ENDPOINT}/${process.env.R2_BUCKET_NAME}/${fileKey}`;
-        return imageUrl;
+        const imageUrl = `https://pub-3ea46b7dcfbf4dd9828bfd06c1989ace.r2.dev/${fileKey}`;
+        console.log("Image URL:", imageUrl); // Log the URL for debugging
+        return imageUrl; // Return the URL as a string
     }
     catch (error) {
         console.error("Error uploading to R2", error);
