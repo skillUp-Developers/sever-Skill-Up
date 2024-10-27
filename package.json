@@ -1,41 +1,47 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon dist/index.js",
     "dev": "nodemon src/index.ts",
-    "build": "prisma generate && tsc"
+    "clean": "rm -rf dist",
+    "build": "npm run clean && prisma generate && tsc",
+    "start": "node dist/index.js",
+    "prestart": "npm run build"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "This backend project uses **Node.js**, **TypeScript**, and **Prisma** ORM, with **PostgreSQL** as the database. The project follows best practices for environment-based configuration using a `.env` file.",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.670.0",
     "@aws-sdk/s3-request-presigner": "^3.670.0",
     "@prisma/client": "^5.21.0",
-    "@types/bcryptjs": "^2.4.6",
-    "@types/cors": "^2.8.17",
-    "@types/dotenv": "^6.1.1",
-    "@types/express": "^5.0.0",
-    "@types/jsonwebtoken": "^9.0.7",
-    "@types/nodemon": "^1.19.6",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
-    "nodemon": "^3.1.7",
-    "pg": "^8.13.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.6.3"
+    "pg": "^8.13.0"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.17",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.7",
     "@types/multer": "^1.4.12",
+    "@types/node": "^20.4.2",
     "@types/uuid": "^10.0.0",
-    "prisma": "^5.21.0"
+    "nodemon": "^3.1.7",
+    "prisma": "^5.21.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
   }
 }
